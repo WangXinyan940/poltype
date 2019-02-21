@@ -99,9 +99,12 @@ superposeexe = "superpose.x"
 # Initialize constants, basis sets
 defopbendval = 0.20016677990819662
 Hartree2kcal_mol = 627.5095
+optmethod = "M062X em=gd3"
 optbasisset = "6-31G*"
+dmamethod = "M062X em=gd3"
 dmabasisset = "6-311G**"
 popbasisset = "6-31G*"
+espmethod = "M062X em=gd3"
 espbasisset = "6-311++G(2d,2p)"
 m06lbasisset = "6-311++G**"
 
@@ -1077,9 +1080,9 @@ def gen_optcomfile (comfname,numproc,maxmem,chkname,mol):
         optimizeoptlist.insert(0,"modred")
     optstr=gen_opt_str(optimizeoptlist)
     if ('I ' in mol.GetSpacedFormula()):
-        tmpfh.write("%s HF/Gen freq Guess=INDO MaxDisk=%s\n" % (optstr,maxdisk))
+        tmpfh.write("%s HF/Gen freq \n" % (optstr))
     else:
-        tmpfh.write("%s MP2/%s freq Guess=INDO MaxDisk=%s\n" % (optstr,optbasisset,maxdisk))
+        tmpfh.write("%s %s %s freq \n" % (optstr,optmethod,optbasisset))
 
     commentstr = molecprefix + " Gaussian SP Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
@@ -1123,11 +1126,17 @@ def gen_comfile (comfname,numproc,maxmem,chkname,tailfname,mol):
     tmpfh = open(comfname, "a")
     #NOTE: Need to pass parameter to specify basis set
     if ('dma' in comfname):
-        opstr="#MP2/%s Sp Density=MP2 MaxDisk=%s\n" % (dmabasisset, maxdisk)
+        if "MP2" in dmamethod.upper():
+            opstr="#MP2/%s Sp Density=MP2 MaxDisk=%s\n" % (dmabasisset, maxdisk)
+        else:
+            opstr="#p %s %s Sp  \n" % (dmamethod,dmabasisset)
     elif ('pop' in comfname):
         opstr="#P HF/%s MaxDisk=%s Pop=SaveMixed\n" % (popbasisset, maxdisk)
     else:
-        opstr="#MP2/%s Sp Density=MP2 SCF=Save Guess=Huckel MaxDisk=%s\n" % (espbasisset, maxdisk)
+        if "MP2" in dmamethod.upper():
+            opstr="#MP2/%s Sp Density=MP2 SCF=Save Guess=Huckel MaxDisk=%s\n" % (espbasisset, maxdisk)
+        else:
+            opstr="#p %s %s Sp  \n" % (espmethod,espbasisset)
 
     bset=re.search('(?i)(6-31|aug-cc)\S+',opstr)
     if ('I ' in mol.GetSpacedFormula()):
@@ -1166,14 +1175,13 @@ def gen_torcomfile (comfname,numproc,maxmem,prevstruct,xyzf):
     optstr=gen_opt_str(optimizeoptlist)
 
     if ('-opt-' in comfname):
-        operationstr = "%s HF/%s MaxDisk=%s\n" % (optstr,optbasisset, maxdisk)
+        operationstr = "%s %s %s \n" % (optstr,optmethod,optbasisset)
         commentstr = molecprefix + " Rotatable Bond Optimization on " + gethostname()
     else:
 #        operationstr = "#m06L/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s\n" % (m06lbasisset, maxdisk)
-        operationstr = "#MP2/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s\n" % (m06lbasisset, maxdisk)
+        operationstr = "#%s %s SP \n" % (optmethod,optbasisset)
         commentstr = molecprefix + " Rotatable Bond SP Calculation on " + gethostname()
 
-    bset=re.search('6-31\S+',operationstr)
     if ('I ' in mol.GetSpacedFormula()):
         operationstr=re.sub(r'6-31\S+',r'Gen',operationstr)
     tmpfh.write(operationstr)
