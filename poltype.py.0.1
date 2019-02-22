@@ -3537,10 +3537,10 @@ def main():
 
     # Torsion scanning then fitting. *.key_5 will contain updated torsions
     # default, parmtors = True
-    if (parmtors):
+    if parmtors:
         # torsion scanning
         gen_torsion(optmol)
-    if (parmtors):
+    if parmtors:
         # torsion fitting
         process_rot_bond_tors(optmol)
     else:
