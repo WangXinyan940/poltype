@@ -249,12 +249,18 @@ def parse_options(argv):
             maxdisk = a
         elif o in ("-a", "--atmidx"):
             prmstartidx = int(a)
+        elif o in ("--optmethod"):
+            optmethod = a
         elif o in ("--optbasisset"):
             optbasisset = a
+        elif o in ("--dmamethod"):
+            dmamethod = a
         elif o in ("--dmabasisset"):
             dmabasisset = a
         elif o in ("--popbasisset"):
             popbasisset = a
+        elif o in ("--espmethod"):
+            espmethod = a
         elif o in ("--espbasisset"):
             espbasisset = a
         elif o in ("--m06lbasisset"):
@@ -541,8 +547,11 @@ def usage ():
     -m MEMORY , --maxmem    -- 
     -M, --maxdisk
     -q, --qmonly
+    --optmethod
     --optbasisset
+    --dmamethod
     --dmabasisset
+    --espmethod
     --espbasisset
     --m06lbasisset
     --omit-espfit
