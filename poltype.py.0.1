@@ -134,6 +134,7 @@ def call_subsystem(cmdstr, iscritical=False):
     Output:
     Description: -
     """
+    print cmdstr
     now = time.strftime("%c",time.localtime())
     logfh.write(now + " Calling: " + cmdstr + "\n")
     logfh.flush()
