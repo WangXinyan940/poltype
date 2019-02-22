@@ -2504,7 +2504,10 @@ def compute_qm_tor_energy(a,b,c,d,startangle,phase_list = None):
         tor_energy = None
         for line in tmpfh:
 #            m = re.search(r'E\(RM06L\) =\s+(\-*\d+\.\d+)',line)
-            m = re.search(r'EUMP2 =\s+(\-*\d+\.\d+D\+\d+)',line)
+            if "MP2" in optmethod.upper():
+                m = re.search(r'EUMP2 =\s+(\-*\d+\.\d+D\+\d+)',line)
+            else:
+                m = re.search(r'SCF Done:  E\([A-Za-z0-9]{1,}\) =\s+(\-*\d+\.\d+D\+\d+)',line)
 # this change below will work for both M06L (has no D+ in results) and MP2
             if not m is None:
                 mengi = m.group(1).replace('D+', 'E+')
