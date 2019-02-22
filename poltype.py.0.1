@@ -412,16 +412,6 @@ def initialize ():
 
     if ("TINKERDIR" in os.environ):
         tinkerdir = os.environ["TINKERDIR"]
-        promof = open(tinkerdir+"/promo.f")
-        latestversion = False
-        for line in promof:
-            if "6.2" in line:
-                latestversion = True
-                break
-        promof.close()
-        if(not latestversion):
-            print "ERROR: Not latest version of tinker (6.2)"
-            sys.exit(1)
         peditexe = os.path.join(tinkerdir,peditexe)
         potentialexe = os.path.join(tinkerdir,potentialexe)
         valenceexe = os.path.join(tinkerdir,valenceexe)
