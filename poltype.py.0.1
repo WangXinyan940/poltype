@@ -996,7 +996,7 @@ def is_qm_normal_termination(logfname):
     return False
 
 def gen_opt_str(optimizeoptlist):
-    optstr = "#opt"
+    optstr = "# opt"
     if optimizeoptlist:
         optstr += "=(" + ','.join(optimizeoptlist) + ")"
     return optstr
@@ -1079,9 +1079,9 @@ def gen_optcomfile (comfname,numproc,maxmem,chkname,mol):
         optimizeoptlist.insert(0,"modred")
     optstr=gen_opt_str(optimizeoptlist)
     if ('I ' in mol.GetSpacedFormula()):
-        tmpfh.write("%s HF/Gen freq \n" % (optstr))
+        tmpfh.write("%s HF/Gen \n" % (optstr))
     else:
-        tmpfh.write("%s %s %s freq \n" % (optstr,optmethod,optbasisset))
+        tmpfh.write("%s %s %s \n" % (optstr,optmethod,optbasisset))
 
     commentstr = molecprefix + " Gaussian SP Calculation on " + gethostname()
     tmpfh.write('\n%s\n\n' % commentstr)
@@ -1178,7 +1178,7 @@ def gen_torcomfile (comfname,numproc,maxmem,prevstruct,xyzf):
         commentstr = molecprefix + " Rotatable Bond Optimization on " + gethostname()
     else:
 #        operationstr = "#m06L/%s SP SCF=(qc,maxcycle=800) Guess=Indo MaxDisk=%s\n" % (m06lbasisset, maxdisk)
-        operationstr = "#%s %s SP \n" % (optmethod,optbasisset)
+        operationstr = "# %s %s SP \n" % (optmethod,optbasisset)
         commentstr = molecprefix + " Rotatable Bond SP Calculation on " + gethostname()
 
     if ('I ' in mol.GetSpacedFormula()):
