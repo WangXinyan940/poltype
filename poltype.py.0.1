@@ -1422,7 +1422,10 @@ def gen_gdmain(gdmainfname,molecprefix,fname):
 
     tmpfh.write("Title " + molecprefix + " gdmain\n")
     tmpfh.write("\n")
-    tmpfh.write("File " + fnamesym  + " density MP2\n")
+    if "MP2" in dmamethod.upper():
+        tmpfh.write("File " + fnamesym  + " density MP2\n")
+    else:
+        tmpfh.write("File " + fnamesym  + " density SCF\n")
     tmpfh.write("Angstrom\n")
     tmpfh.write("AU\n")
     tmpfh.write("Multipoles\n")
@@ -2378,8 +2381,10 @@ def gen_esp_grid():
             fckfname = os.path.splitext(fckfname)[0]
 
         assert os.path.isfile(fckfname), "Error: " + fckfname + " does not exist."
-        gencubecmd = cubegenexe + " 0 potential=MP2 " + fckfname + " " + \
-                     qmespfname + " -5 h < " + espgrdfname
+        if "MP2" in espmethod.upper():
+            gencubecmd = cubegenexe + " 0 potential=MP2 " + fckfname + " " + qmespfname + " -5 h < " + espgrdfname
+        else:
+            gencubecmd = cubegenexe + " 0 potential=SCF " + fckfname + " " + qmespfname + " -5 h < " + espgrdfname
         call_subsystem(gencubecmd,iscritical=True)
     # Run potential
     if not os.path.isfile(qmesp2fname):
