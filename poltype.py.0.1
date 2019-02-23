@@ -60,7 +60,7 @@ import valence
 prmstartidx = 401
 
 # These values can be edited. Affect speed of QM calculations.
-numproc = 1
+numproc = 24
 maxmem = "700MB"
 maxdisk = "100GB"
 
@@ -83,28 +83,28 @@ gdmaexe = "gdma"
 eleparmexe = sys.path[0] + "/electrostatic-param.pl"
 groupsymexe = sys.path[0] + "/groupsym.exe"
 avgmpolesexe = sys.path[0] + "/avgmpoles.pl"
-peditexe = "poledit.x"
-potentialexe = "potential.x"
-valenceexe = "valence.x"
-minimizeexe = "minimize.x"
-analyzeexe = "analyze.x"
-superposeexe = "superpose.x"
-#peditexe = "poledit"
-#potentialexe = "potential"
-#valenceexe = "valence"
-#minimizeexe = "minimize"
-#analyzeexe = "analyze"
-#superposeexe = "superpose"
+#peditexe = "poledit.x"
+#potentialexe = "potential.x"
+#valenceexe = "valence.x"
+#minimizeexe = "minimize.x"
+#analyzeexe = "analyze.x"
+#superposeexe = "superpose.x"
+peditexe = "poledit"
+potentialexe = "potential"
+valenceexe = "valence"
+minimizeexe = "minimize"
+analyzeexe = "analyze"
+superposeexe = "superpose"
 
 # Initialize constants, basis sets
 defopbendval = 0.20016677990819662
 Hartree2kcal_mol = 627.5095
-optmethod = "M062X em=gd3"
+optmethod = "M062X em=gd3 int=ultrafine"
 optbasisset = "6-31G*"
-dmamethod = "M062X em=gd3"
+dmamethod = "M062X em=gd3 int=ultrafine"
 dmabasisset = "6-311G**"
 popbasisset = "6-31G*"
-espmethod = "M062X em=gd3"
+espmethod = "M062X em=gd3 int=ultrafine"
 espbasisset = "6-311++G(2d,2p)"
 m06lbasisset = "6-311++G**"
 
