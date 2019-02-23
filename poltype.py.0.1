@@ -60,7 +60,7 @@ import valence
 prmstartidx = 401
 
 # These values can be edited. Affect speed of QM calculations.
-numproc = 24
+numproc = 8
 maxmem = "700MB"
 maxdisk = "100GB"
 
@@ -68,7 +68,7 @@ maxdisk = "100GB"
 gausdir = None
 gdmadir = None
 tinkerdir = None
-scratchdir = "/scratch"
+scratchdir = "/mnt/e/scratch"
 paramfname = sys.path[0] + "/amoeba_v2_new.prm"
 paramhead = sys.path[0] + "/amoeba_v2_new_head.prm"
 obdatadir = sys.path[0] + "/datadir"
@@ -2035,7 +2035,7 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
         tmpkeyfh = open(tmpkeyfname,'a')
         tmpkeyfh.write('restrain-torsion %d %d %d %d 10.0 %6.2f %6.2f\n' % (a,b,c,d,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
         tmpkeyfh.close()
-        os.system("cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname))
+        #os.system("cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname))
         mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
         call_subsystem(mincmdstr)
 
@@ -2106,11 +2106,15 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
             tmpkeyfh = open(tmpkeyfname,'a')
             tmpkeyfh.write('restrain-torsion %d %d %d %d 10.0 %6.2f %6.2f\n' % (a,b,c,d,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
             tmpkeyfh.close()
-            os.system("cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname))
+            #os.system("cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname))
             # minimize the structure to the restraint
             mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
             call_subsystem(mincmdstr)
-
+            if torxyzfname+'_2' not in os.listdir("."):
+                cmd = "cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname)
+                call_subsystem(cmd)
+                mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
+                call_subsystem(mincmdstr)
             # generate the *.com file using the minimized *.xyz, *.xyz_2
             gen_torcomfile(torspcomfname,numproc,maxmem,prevstruct,torxyzfname+'_2')
         else:
@@ -2161,7 +2165,7 @@ def gen_torsion(mol):
         minstrctfname = prevstrctfname
         
         # copy *-opt.log found early by Gaussian to 'prevstrctfname'
-        cmd = 'cp ../%s %s' % (logoptfname,prevstrctfname)
+        cmd = 'cp ../%s %s' % (logespfname,prevstrctfname)
         call_subsystem(cmd)
 
         # run Gaussian SP on logoptfname
