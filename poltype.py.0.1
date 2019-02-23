@@ -2035,7 +2035,7 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
         tmpkeyfh = open(tmpkeyfname,'a')
         tmpkeyfh.write('restrain-torsion %d %d %d %d 10.0 %6.2f %6.2f\n' % (a,b,c,d,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
         tmpkeyfh.close()
-        os.system("cp ../%s.xyz_2 %s.xyz"%(molecprefix,torxyzfname))
+        os.system("cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname))
         mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
         call_subsystem(mincmdstr)
 
@@ -2106,7 +2106,7 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
             tmpkeyfh = open(tmpkeyfname,'a')
             tmpkeyfh.write('restrain-torsion %d %d %d %d 10.0 %6.2f %6.2f\n' % (a,b,c,d,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
             tmpkeyfh.close()
-            os.system("cp ../%s.xyz_2 %s.xyz"%(molecprefix,torxyzfname))
+            os.system("cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname))
             # minimize the structure to the restraint
             mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
             call_subsystem(mincmdstr)
