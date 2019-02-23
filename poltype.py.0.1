@@ -57,10 +57,10 @@ import valence
 # 4) Run avgmpoles.pl
 
 # Default starting index of atom type
-prmstartidx = 601
+prmstartidx = 401
 
 # These values can be edited. Affect speed of QM calculations.
-numproc = 8
+numproc = 1
 maxmem = "700MB"
 maxdisk = "100GB"
 
@@ -68,7 +68,7 @@ maxdisk = "100GB"
 gausdir = None
 gdmadir = None
 tinkerdir = None
-scratchdir = "/mnt/e/scratch"
+scratchdir = "/scratch"
 paramfname = sys.path[0] + "/amoeba_v2_new.prm"
 paramhead = sys.path[0] + "/amoeba_v2_new_head.prm"
 obdatadir = sys.path[0] + "/datadir"
@@ -83,28 +83,28 @@ gdmaexe = "gdma"
 eleparmexe = sys.path[0] + "/electrostatic-param.pl"
 groupsymexe = sys.path[0] + "/groupsym.exe"
 avgmpolesexe = sys.path[0] + "/avgmpoles.pl"
-#peditexe = "poledit.x"
-#potentialexe = "potential.x"
-#valenceexe = "valence.x"
-#minimizeexe = "minimize.x"
-#analyzeexe = "analyze.x"
-#superposeexe = "superpose.x"
-peditexe = "poledit"
-potentialexe = "potential"
-valenceexe = "valence"
-minimizeexe = "minimize"
-analyzeexe = "analyze"
-superposeexe = "superpose"
+peditexe = "poledit.x"
+potentialexe = "potential.x"
+valenceexe = "valence.x"
+minimizeexe = "minimize.x"
+analyzeexe = "analyze.x"
+superposeexe = "superpose.x"
+#peditexe = "poledit"
+#potentialexe = "potential"
+#valenceexe = "valence"
+#minimizeexe = "minimize"
+#analyzeexe = "analyze"
+#superposeexe = "superpose"
 
 # Initialize constants, basis sets
 defopbendval = 0.20016677990819662
 Hartree2kcal_mol = 627.5095
-optmethod = "M062X em=gd3 int=ultrafine"
+optmethod = "M062X em=gd3"
 optbasisset = "6-31G*"
-dmamethod = "M062X em=gd3 int=ultrafine"
+dmamethod = "M062X em=gd3"
 dmabasisset = "6-311G**"
 popbasisset = "6-31G*"
-espmethod = "M062X em=gd3 int=ultrafine"
+espmethod = "M062X em=gd3"
 espbasisset = "6-311++G(2d,2p)"
 m06lbasisset = "6-311++G**"
 
@@ -134,7 +134,6 @@ def call_subsystem(cmdstr, iscritical=False):
     Output:
     Description: -
     """
-    print cmdstr
     now = time.strftime("%c",time.localtime())
     logfh.write(now + " Calling: " + cmdstr + "\n")
     logfh.flush()
@@ -233,7 +232,7 @@ def parse_options(argv):
     global omittorsion2
     global do_tor_qm_opt
     try:
-        opts, xargs = getopt.getopt(argv[1:],'hqn:m:M:a:s:p:d:u:',["help","qmonly","optmethod=","optbasisset=","dmamethod=","dmabasisset=","popbasisset=","espmethod=","espbasisset=","m06lbasisset=","optlog=","dmalog=","esplog=","dmafck=","espfck=","numproc=","maxmem=","maxdisk=","atmidx=","structure=","prefix=","gdmaout=","gbindir=","qm-scratch-dir=","omit-espfit","omit-torsion","test-tor-key=","uniqidx","tinker4format","omit-torsion2","do-tor-qm-opt"])
+        opts, xargs = getopt.getopt(argv[1:],'hqn:m:M:a:s:p:d:u:',["help","qmonly","optbasisset=","dmabasisset=","popbasisset=","espbasisset=","m06lbasisset=","optlog=","dmalog=","esplog=","dmafck=","espfck=","numproc=","maxmem=","maxdisk=","atmidx=","structure=","prefix=","gdmaout=","gbindir=","qm-scratch-dir=","omit-espfit","omit-torsion","test-tor-key=","uniqidx","tinker4format","omit-torsion2","do-tor-qm-opt"])
     except getopt.GetoptError, err:
         print str(err)
         usage()
@@ -574,7 +573,7 @@ def load_structfile(structfname):
     if strctext in '.fchk':
         tmpconv.SetInFormat('fchk')
     elif strctext in '.log':
-        tmpconv.SetInFormat('g09')
+        tmpconv.SetInFormat('g03')
     else:
         inFormat = openbabel.OBConversion.FormatFromExt(structfname)
         tmpconv.SetInFormat(inFormat)
@@ -2035,9 +2034,6 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
         tmpkeyfh = open(tmpkeyfname,'a')
         tmpkeyfh.write('restrain-torsion %d %d %d %d 10.0 %6.2f %6.2f\n' % (a,b,c,d,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
         tmpkeyfh.close()
-        cmd = "cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname) #bug fix--Xinyan
-        os.system("cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname)) #bug fix--Xinyan
-        print cmd
         mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
         call_subsystem(mincmdstr)
 
@@ -2103,9 +2099,7 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
             tmpkeyfname = 'tmp-%d-%d-%d-%d-%03d-t.key' % (a,b,c,d,round((torang+phaseangle)%360))
             save_structfile(prevstruct,torxyzfname)
             shutil.copy('../'+key4fname, tmpkeyfname)
-            cmd = "cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname) #bug fix--Xinyan
-            os.system("cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname)) #bug fix--Xinyan
-            print cmd
+
             # add restraint key word
             tmpkeyfh = open(tmpkeyfname,'a')
             tmpkeyfh.write('restrain-torsion %d %d %d %d 10.0 %6.2f %6.2f\n' % (a,b,c,d,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
@@ -2509,10 +2503,7 @@ def compute_qm_tor_energy(a,b,c,d,startangle,phase_list = None):
         tor_energy = None
         for line in tmpfh:
 #            m = re.search(r'E\(RM06L\) =\s+(\-*\d+\.\d+)',line)
-            if "MP2" in optmethod.upper():
-                m = re.search(r'EUMP2 =\s+(\-*\d+\.\d+D\+\d+)',line)
-            else:
-                m = re.search(r'SCF Done:  E\([A-Za-z0-9]{1,}\) =\s+(\-*\d+\.\d+)',line)
+            m = re.search(r'EUMP2 =\s+(\-*\d+\.\d+D\+\d+)',line)
 # this change below will work for both M06L (has no D+ in results) and MP2
             if not m is None:
                 mengi = m.group(1).replace('D+', 'E+')
