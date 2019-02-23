@@ -2113,7 +2113,7 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
             if torxyzfname+'_2' not in os.listdir("."):
                 if "m06lsp" in prevstrctfname:
                     ftmp = [i for i in prevstrctfname.split(".")[0].split("-")]
-                    cmd = "cp %s.xyz_2 %s"%("-".join([ftmp[0],ftmp[2],ftmp[3],ftmp[4],ftmp[5],ftmp[6]]),torxyzfname)
+                    cmd = "cp %s-t.xyz_2 %s"%("-".join([ftmp[0],ftmp[2],ftmp[3],ftmp[4],ftmp[5],ftmp[6]]),torxyzfname)
                 else:
                     cmd = "cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname)
                 call_subsystem(cmd)
