@@ -3197,9 +3197,11 @@ def write_key_file(write_prm_dict,tmpkey1basename,tmpkey2basename):
 #               torvals == [0.]*len(torvals):
             if clskey in write_prm_dict:
                 torline = ' torsion %7s %4s %4s %4s   ' % (cl[0],cl[1],cl[2],cl[3])
+                fold_d = {1:"   0.0000 0.0 1", 2:"   0.0000 0.0 2", 3:"   0.0000 0.0 3"}
                 for (nfold, prm) in write_prm_dict[clskey].items():
-                    torline += ' %7.3f %.1f %d' % (prm,foldoffsetlist[nfold - 1], nfold)
-                torline += '\n'
+                    tmp = ' %7.3f %.1f %d' % (prm,foldoffsetlist[nfold - 1], nfold)
+                    fold_d[nfold] = tmp
+                torline += fold_d[1] + fold_d[2] + fold_d[3] + '\n'
             tmpfh2.write(torline)
     tmpfh1.close()
     tmpfh2.close()
