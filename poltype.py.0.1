@@ -60,7 +60,7 @@ import valence
 prmstartidx = 401
 
 # These values can be edited. Affect speed of QM calculations.
-numproc = 1
+numproc = 8
 maxmem = "700MB"
 maxdisk = "100GB"
 
@@ -68,7 +68,7 @@ maxdisk = "100GB"
 gausdir = None
 gdmadir = None
 tinkerdir = None
-scratchdir = "/scratch"
+scratchdir = "/mnt/e/scratch"
 paramfname = sys.path[0] + "/amoeba_v2_new.prm"
 paramhead = sys.path[0] + "/amoeba_v2_new_head.prm"
 obdatadir = sys.path[0] + "/datadir"
@@ -83,28 +83,28 @@ gdmaexe = "gdma"
 eleparmexe = sys.path[0] + "/electrostatic-param.pl"
 groupsymexe = sys.path[0] + "/groupsym.exe"
 avgmpolesexe = sys.path[0] + "/avgmpoles.pl"
-peditexe = "poledit.x"
-potentialexe = "potential.x"
-valenceexe = "valence.x"
-minimizeexe = "minimize.x"
-analyzeexe = "analyze.x"
-superposeexe = "superpose.x"
-#peditexe = "poledit"
-#potentialexe = "potential"
-#valenceexe = "valence"
-#minimizeexe = "minimize"
-#analyzeexe = "analyze"
-#superposeexe = "superpose"
+#peditexe = "poledit.x"
+#potentialexe = "potential.x"
+#valenceexe = "valence.x"
+#minimizeexe = "minimize.x"
+#analyzeexe = "analyze.x"
+#superposeexe = "superpose.x"
+peditexe = "poledit"
+potentialexe = "potential"
+valenceexe = "valence"
+minimizeexe = "minimize"
+analyzeexe = "analyze"
+superposeexe = "superpose"
 
 # Initialize constants, basis sets
 defopbendval = 0.20016677990819662
 Hartree2kcal_mol = 627.5095
-optmethod = "M062X em=gd3"
+optmethod = "M062X em=gd3 int=ultrafine"
 optbasisset = "6-31G*"
-dmamethod = "M062X em=gd3"
+dmamethod = "M062X em=gd3 int=ultrafine"
 dmabasisset = "6-311G**"
 popbasisset = "6-31G*"
-espmethod = "M062X em=gd3"
+espmethod = "M062X em=gd3 int=ultrafine"
 espbasisset = "6-311++G(2d,2p)"
 m06lbasisset = "6-311++G**"
 
@@ -2035,6 +2035,7 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
         tmpkeyfh = open(tmpkeyfname,'a')
         tmpkeyfh.write('restrain-torsion %d %d %d %d 10.0 %6.2f %6.2f\n' % (a,b,c,d,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
         tmpkeyfh.close()
+        #os.system("cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname))
         mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
         call_subsystem(mincmdstr)
 
@@ -2105,11 +2106,19 @@ def tor_opt_sp(molecprefix,a,b,c,d,optmol,consttorlist,phaseangle,prevstrctfname
             tmpkeyfh = open(tmpkeyfname,'a')
             tmpkeyfh.write('restrain-torsion %d %d %d %d 10.0 %6.2f %6.2f\n' % (a,b,c,d,round((torang+phaseangle)%360),round((torang+phaseangle)%360)))
             tmpkeyfh.close()
-
+            #os.system("cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname))
             # minimize the structure to the restraint
             mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
             call_subsystem(mincmdstr)
-
+            if torxyzfname+'_2' not in os.listdir("."):
+                if "m06lsp" in prevstrctfname:
+                    ftmp = [i for i in prevstrctfname.split(".")[0].split("-")]
+                    cmd = "cp %s-t.xyz_2 %s"%("-".join([ftmp[0],ftmp[2],ftmp[3],ftmp[4],ftmp[5],ftmp[6]]),torxyzfname)
+                else:
+                    cmd = "cp ../%s.xyz_2 %s"%(molecprefix,torxyzfname)
+                call_subsystem(cmd)
+                mincmdstr = minimizeexe+' -k '+tmpkeyfname+' '+torxyzfname+' 0.01'
+                call_subsystem(mincmdstr)
             # generate the *.com file using the minimized *.xyz, *.xyz_2
             gen_torcomfile(torspcomfname,numproc,maxmem,prevstruct,torxyzfname+'_2')
         else:
@@ -2160,7 +2169,7 @@ def gen_torsion(mol):
         minstrctfname = prevstrctfname
         
         # copy *-opt.log found early by Gaussian to 'prevstrctfname'
-        cmd = 'cp ../%s %s' % (logoptfname,prevstrctfname)
+        cmd = 'cp ../%s %s' % (logespfname,prevstrctfname)
         call_subsystem(cmd)
 
         # run Gaussian SP on logoptfname
@@ -3197,11 +3206,9 @@ def write_key_file(write_prm_dict,tmpkey1basename,tmpkey2basename):
 #               torvals == [0.]*len(torvals):
             if clskey in write_prm_dict:
                 torline = ' torsion %7s %4s %4s %4s   ' % (cl[0],cl[1],cl[2],cl[3])
-                fold_d = {1:"   0.0000 0.0 1", 2:"   0.0000 0.0 2", 3:"   0.0000 0.0 3"}
                 for (nfold, prm) in write_prm_dict[clskey].items():
-                    tmp = ' %7.3f %.1f %d' % (prm,foldoffsetlist[nfold - 1], nfold)
-                    fold_d[nfold] = tmp
-                torline += fold_d[1] + fold_d[2] + fold_d[3] + '\n'
+                    torline += ' %7.3f %.1f %d' % (prm,foldoffsetlist[nfold - 1], nfold)
+                torline += '\n'
             tmpfh2.write(torline)
     tmpfh1.close()
     tmpfh2.close()
